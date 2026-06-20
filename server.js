@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const Groq = require('groq-sdk');
-require('dotenv').config(); // ✅ ADD THIS LINE
+require('dotenv').config();
 
 const app = express();
 
@@ -13,10 +13,15 @@ app.use(cors({
 }));
 
 app.use(express.json());
-require('dotenv').config();
 
 // 🔥 LOAD GROQ API KEY FROM .env
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+if (!GROQ_API_KEY) {
+    console.error('❌ ERROR: GROQ_API_KEY not found in .env file!');
+    console.error('Please create a .env file with: GROQ_API_KEY=your_key_here');
+    process.exit(1);
+}
 
 const groq = new Groq({ apiKey: GROQ_API_KEY });
 
