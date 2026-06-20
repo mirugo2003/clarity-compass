@@ -1,0 +1,2596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clarity Compass · AI Zero-to-One Builder</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #F8FAFC;
+            color: #0B1E33;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== AUTH ===== */
+        .auth-container {
+            max-width: 420px;
+            margin: 80px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+        }
+        .auth-container h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1E3A8A;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .auth-container p.sub {
+            text-align: center;
+            color: #64748B;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .auth-container input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        .auth-container input:focus {
+            outline: none;
+            border-color: #14B8A6;
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+        }
+        .btn-primary {
+            background: #14B8A6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover {
+            background: #0D9E8E;
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #14B8A6;
+            color: #14B8A6;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-outline:hover {
+            background: #14B8A6;
+            color: white;
+        }
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+        .btn-success {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .auth-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #64748B;
+        }
+        .auth-link a {
+            color: #14B8A6;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+        .error-msg {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        /* ===== APP ===== */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            background: #14B8A6;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+        .logo-text {
+            font-weight: 700;
+            font-size: 24px;
+            color: #1E3A8A;
+        }
+        .logo-text span {
+            color: #14B8A6;
+        }
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #1E3A8A;
+            opacity: 0.7;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            opacity: 1;
+        }
+        .user-email {
+            font-size: 13px;
+            color: #64748B;
+            background: #F1F5F9;
+            padding: 4px 14px;
+            border-radius: 40px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            margin-bottom: 20px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        .tag {
+            display: inline-block;
+            background: #E6F7F5;
+            color: #0D7A6E;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 40px;
+        }
+        .chip {
+            background: #F1F5F9;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #1E3A8A;
+            display: inline-block;
+        }
+        .stat-badge {
+            background: #EFF6FF;
+            color: #1E3A8A;
+            padding: 2px 12px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1E3A8A;
+            margin-bottom: 12px;
+        }
+        .text-muted {
+            color: #64748B;
+        }
+        .text-small {
+            font-size: 13px;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #E9EDF2;
+            margin: 16px 0;
+        }
+
+        /* ===== REASONING ===== */
+        .reasoning-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 12px 0;
+        }
+        .reasoning-item {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .reasoning-number {
+            background: #14B8A6;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .reasoning-content {
+            background: #F1F5F9;
+            padding: 12px 18px;
+            border-radius: 16px;
+            flex: 1;
+        }
+        .reasoning-content strong {
+            display: block;
+            font-weight: 600;
+            color: #1E3A8A;
+            margin-bottom: 4px;
+        }
+        .reasoning-content p {
+            margin: 0;
+            color: #1E293B;
+            font-size: 14px;
+        }
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 16px;
+            background: #14B8A6;
+            animation: blink 0.8s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+        .thinking-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #F1F5F9;
+            border-radius: 16px;
+        }
+        .thinking-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .thinking-dots span {
+            width: 8px;
+            height: 8px;
+            background: #14B8A6;
+            border-radius: 50%;
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+        .thinking-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .thinking-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes dotBounce {
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        .idea-summary-card {
+            background: #F1F9F8;
+            border-radius: 20px;
+            padding: 20px 24px;
+            border-left: 6px solid #14B8A6;
+        }
+        .risk-card {
+            border-radius: 20px;
+            padding: 18px 22px;
+            background: white;
+            border: 1px solid #E9EDF2;
+        }
+        .risk-high {
+            border-left: 6px solid #E74C3C;
+        }
+        .risk-medium {
+            border-left: 6px solid #F39C12;
+        }
+        .risk-low {
+            border-left: 6px solid #2ECC71;
+        }
+
+        /* ===== TREE ROADMAP STYLES ===== */
+        .tree-roadmap {
+            padding: 8px 0;
+        }
+
+        /* Phase Styles */
+        .tree-phase {
+            margin-bottom: 8px;
+            border: 1px solid #E2E8F0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            cursor: pointer;
+            background: #F8FAFC;
+            transition: background 0.2s;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .phase-header:hover {
+            background: #F1F5F9;
+        }
+
+        .phase-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .phase-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #14B8A6;
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .phase-line {
+            width: 2px;
+            height: 20px;
+            background: #14B8A6;
+            margin-top: 4px;
+            opacity: 0.3;
+        }
+
+        .phase-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .phase-label {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1E3A8A;
+        }
+
+        .phase-tag {
+            background: #E6F7F5;
+            color: #0D7A6E;
+            font-size: 11px;
+        }
+
+        .phase-toggle {
+            margin-left: auto;
+            font-size: 12px;
+            color: #94A3B8;
+            transition: transform 0.3s;
+        }
+
+        .phase-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .phase-content {
+            padding: 0 20px 20px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .phase-content.collapsed {
+            display: none;
+        }
+
+        /* Week Styles */
+        .tree-week {
+            position: relative;
+            padding-left: 32px;
+            margin-top: 16px;
+        }
+
+        .tree-week:last-child {
+            margin-bottom: 0;
+        }
+
+        .week-connector {
+            position: absolute;
+            left: 15px;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: #E2E8F0;
+        }
+
+        .tree-week:last-child .week-connector {
+            height: 24px;
+        }
+
+        .week-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-left: -12px;
+            border-left: 3px solid #14B8A6;
+        }
+
+        .week-header:hover {
+            background: #F8FAFC;
+        }
+
+        .week-number {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1E3A8A;
+        }
+
+        .week-toggle {
+            font-size: 11px;
+            color: #94A3B8;
+            transition: transform 0.3s;
+            margin-left: auto;
+        }
+
+        .week-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .week-tasks {
+            padding: 8px 12px 4px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .week-tasks.collapsed {
+            display: none;
+        }
+
+        /* Task Styles */
+        .task-item {
+            display: flex;
+            gap: 12px;
+            padding: 6px 0;
+            align-items: flex-start;
+            border-bottom: 1px solid #F8FAFC;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item.subtask {
+            padding-left: 20px;
+            opacity: 0.8;
+        }
+
+        .task-bullet {
+            color: #14B8A6;
+            font-size: 12px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .task-item.subtask .task-bullet {
+            color: #94A3B8;
+        }
+
+        .task-title {
+            font-weight: 500;
+            font-size: 14px;
+            color: #0B1E33;
+        }
+
+        .task-desc {
+            font-size: 13px;
+            color: #64748B;
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .task-complete {
+            margin-left: 28px;
+        }
+
+        /* First Step Card Animation */
+        .first-step-card {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 20px 4px rgba(20, 184, 166, 0.1);
+            }
+        }
+
+        /* ===== OTHER ===== */
+        .roadmap-phase {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 22px;
+            border: 1px solid #E9EDF2;
+            flex: 1;
+            min-width: 200px;
+        }
+        .roadmap-phase .phase-label {
+            font-weight: 700;
+            color: #1E3A8A;
+            font-size: 18px;
+        }
+        .first-step-highlight {
+            background: #14B8A6;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #E2E8F0;
+            border-radius: 20px;
+            width: 100%;
+            margin: 8px 0;
+        }
+        .progress-fill {
+            height: 8px;
+            border-radius: 20px;
+            background: #14B8A6;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        textarea {
+            width: 100%;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            transition: 0.2s;
+            background: white;
+            resize: vertical;
+            min-height: 120px;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #14B8A6;
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+        }
+
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        .idea-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .idea-card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid #EDF2F7;
+            transition: 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .idea-card:hover {
+            border-color: #14B8A6;
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.08);
+        }
+        .idea-card .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #EF4444;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.5;
+            transition: 0.2s;
+        }
+        .idea-card .delete-btn:hover {
+            opacity: 1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1E3A8A;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.3s;
+            max-width: 400px;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success {
+            background: #0D9488;
+        }
+        .toast.error {
+            background: #EF4444;
+        }
+        .toast.warning {
+            background: #F59E0B;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #E9EDF2;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-links {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .phase-title-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .phase-toggle {
+                margin-left: 0;
+            }
+            .tree-week {
+                padding-left: 16px;
+            }
+            .week-connector {
+                left: 7px;
+            }
+            .task-item.subtask {
+                padding-left: 8px;
+            }
+            .first-step-card {
+                padding: 16px;
+            }
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #E2E8F0;
+            border-top-color: #14B8A6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== API STATUS ===== */
+        .api-status {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .api-status.online {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        .api-status.offline {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <!-- ===== TOAST ===== -->
+        <div id="toast" class="toast"></div>
+
+        <!-- ===== AUTH ===== -->
+        <div id="authPage" class="auth-container">
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="background:#14B8A6;width:64px;height:64px;border-radius:16px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;">
+                    <span style="color:white;font-size:28px;font-weight:700;">CC</span>
+                </div>
+                <h2>Clarity Compass</h2>
+                <p class="sub">Turn your ideas into reality with AI</p>
+            </div>
+
+            <div id="authError" class="error-msg hidden"></div>
+
+            <div id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email address" />
+                <input type="password" id="loginPassword" placeholder="Password" />
+                <button class="btn-primary" id="loginBtn">Sign In</button>
+                <div class="auth-link">
+                    Don't have an account? <a id="showSignup">Create one</a>
+                </div>
+            </div>
+
+            <div id="signupForm" class="hidden">
+                <input type="text" id="signupName" placeholder="Full name" />
+                <input type="email" id="signupEmail" placeholder="Email address" />
+                <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" />
+                <button class="btn-primary" id="signupBtn">Create Account</button>
+                <div class="auth-link">
+                    Already have an account? <a id="showLogin">Sign in</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== APP ===== -->
+        <div id="appPage" class="hidden">
+            <div class="container">
+
+                <!-- Top Bar -->
+                <div class="top-bar">
+                    <div class="logo">
+                        <div class="logo-icon">CC</div>
+                        <div class="logo-text">Clarity<span>Compass</span></div>
+                    </div>
+                    <div class="nav-links">
+                        <a class="active" data-page="dashboard">Dashboard</a>
+                        <a data-page="ideas">My Ideas</a>
+                        <a data-page="new-idea">New Idea</a>
+                        <span class="user-email" id="userEmailDisplay"></span>
+                        <span id="apiStatus" class="api-status offline">⚡ Checking API...</span>
+                        <button class="btn-outline" style="padding:4px 16px;font-size:12px;" id="signOutBtn">Sign Out</button>
+                    </div>
+                </div>
+
+                <!-- ===== DASHBOARD ===== -->
+                <div id="page-dashboard" class="page active">
+                    <div class="flex-between" style="margin-bottom:16px;">
+                        <div>
+                            <h1 style="font-size:28px;font-weight:700;color:#1E3A8A;" id="greeting">Hi there 👋</h1>
+                            <p class="text-muted">What idea do you want to turn into reality?</p>
+                        </div>
+                        <button class="btn-primary" onclick="navigateTo('new-idea')">+ Start New Idea</button>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="flex-between">
+                                <span class="section-title" style="font-size:18px;">Recent Ideas</span>
+                                <span class="tag">updated</span>
+                            </div>
+                            <div id="recentIdeasList">
+                                <p class="text-muted" style="padding:16px 0;">No ideas yet. Start your first project!</p>
+                            </div>
+                            <hr />
+                            <div class="flex-between">
+                                <span><strong>My Ideas</strong> <span class="stat-badge" id="progressStat">0%</span></span>
+                                <a onclick="navigateTo('ideas')" style="color:#14B8A6;font-weight:600;text-decoration:none;cursor:pointer;">View all →</a>
+                            </div>
+                        </div>
+
+                        <div class="card" style="background:#F1F9F8;">
+                            <div style="display:flex;gap:12px;align-items:flex-start;">
+                                <div style="background:#14B8A6;width:40px;height:40px;border-radius:60px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px;">AI</div>
+                                <div>
+                                    <p style="font-weight:500;" id="aiInsight">“I'm ready to help you build your first idea. Click 'Start New Idea' to begin!”</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div>
+                                <p class="text-muted text-small" style="font-weight:500;">SYSTEM INSIGHTS</p>
+                                <ul style="list-style:none;margin-top:8px;font-size:14px;color:#1E293B;" id="systemInsights">
+                                    <li style="padding:4px 0;">1. Ready to analyze your first project idea</li>
+                                    <li style="padding:4px 0;">2. Groq AI models loaded and waiting for input</li>
+                                    <li style="padding:4px 0;">3. Click "New Idea" to get started</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-3" style="margin-top:16px;">
+                        <div class="card">
+                            <span class="tag">template</span>
+                            <h4 style="margin:8px 0 4px;">Academic Research Paper</h4>
+                            <p class="text-muted text-small">Structured framework for complex research projects.</p>
+                            <button class="btn-outline" style="width:100%;margin-top:10px;font-size:12px;padding:6px;" onclick="useTemplate()">Use Template</button>
+                        </div>
+                        <div class="card">
+                            <span class="tag">focus</span>
+                            <h4 style="margin:8px 0 4px;">Your Focus This Week</h4>
+                            <p style="font-size:28px;font-weight:700;color:#1E3A8A;" id="activeHours">0 hrs</p>
+                            <span class="chip">Active Hours</span>
+                        </div>
+                        <div class="card" style="background:#1E3A8A;color:white;">
+                            <h4 style="margin-bottom:8px;">Responsible AI</h4>
+                            <p class="text-small" style="opacity:0.85;">Transparency · User control · Uncertainty framing</p>
+                            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+                                <span style="background:rgba(255,255,255,0.12);padding:4px 14px;border-radius:60px;font-size:11px;cursor:pointer;" onclick="showToast('Responsible AI: Transparency & user control')">Transparency</span>
+                                <span style="background:rgba(255,255,255,0.12);padding:4px 14px;border-radius:60px;font-size:11px;cursor:pointer;" onclick="showToast('Terms of Service: claritycompass.com/terms')">Terms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer">© 2026 Clarity Compass. Built for academic excellence.</div>
+                </div>
+
+                <!-- ===== NEW IDEA ===== -->
+                <div id="page-new-idea" class="page">
+                    <button onclick="navigateTo('dashboard')" style="background:none;border:none;color:#64748B;cursor:pointer;margin-bottom:16px;">← Back to Dashboard</button>
+                    <div class="card" style="max-width:700px;margin:0 auto;">
+                        <h2 class="section-title">New Project Idea</h2>
+                        <p class="text-muted">Don't worry about the details yet. Just dump your thoughts and we'll refine them together.</p>
+
+                        <div style="margin-top:16px;">
+                            <label style="font-weight:600;font-size:14px;color:#1E3A8A;">Describe your idea (it's okay if it's messy)</label>
+                            <textarea id="ideaInput" placeholder="e.g. 'Visa portal for international students...'"></textarea>
+                        </div>
+
+                        <p class="text-muted text-small" style="margin-top:6px;">Capturing your raw vision</p>
+
+                        <div class="flex-row" style="margin-top:12px;">
+                            <span class="chip" style="cursor:pointer;" onclick="startVoiceRecording()">🎤 Voice Memo</span>
+                            <span class="chip" style="cursor:pointer;" onclick="document.getElementById('fileInput').click()">📄 Upload Doc</span>
+                            <input type="file" id="fileInput" style="display:none" accept=".txt,.md" onchange="handleFileUpload(event)" />
+                            <button class="btn-primary" id="startClarifyBtn">Start AI Clarification →</button>
+                        </div>
+
+                        <div style="margin-top:16px;background:#F1F5F9;border-radius:16px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:#64748B;">
+                            <span>🧠 Cognitive Load: Low - Ready for deep thought</span>
+                            <span>💡 Tip: Mention the problem you're solving</span>
+                            <span id="apiStatusText" style="font-weight:500;">⚡ Using Groq AI</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== CLARIFICATION ===== -->
+                <div id="page-clarify" class="page">
+                    <button onclick="navigateTo('dashboard')" style="background:none;border:none;color:#64748B;cursor:pointer;margin-bottom:16px;">← Back to Dashboard</button>
+                    <div class="grid-2">
+                        <div>
+                            <div class="card">
+                                <div class="flex-between">
+                                    <h3 class="section-title" style="font-size:20px;margin-bottom:0;">Internal Reasoning</h3>
+                                    <span class="tag">step-by-step</span>
+                                </div>
+                                <div class="reasoning-list" id="reasoningContainer">
+                                    <div class="thinking-indicator" id="thinkingIndicator">
+                                        <span style="font-weight:500;">AI is thinking</span>
+                                        <div class="thinking-dots"><span></span><span></span><span></span></div>
+                                    </div>
+                                </div>
+                                <div style="margin-top:16px;background:#E6F7F5;border-radius:40px;padding:6px 20px;display:inline-block;font-weight:600;font-size:14px;" id="projectProgress">
+                                    Project Phase Analysis · 0% Complete
+                                </div>
+                            </div>
+
+                            <div class="card idea-summary-card" id="ideaSummary">
+                                <h4 style="color:#1E3A8A;">Your Idea So Far</h4>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;" id="summaryContent">
+                                    <div><span class="text-muted text-small">TITLE</span><br><strong id="summaryTitle">—</strong></div>
+                                    <div><span class="text-muted text-small">CONTEXT</span><br><strong id="summaryContext">—</strong></div>
+                                    <div><span class="text-muted text-small">TECH SCOPE</span><br><strong id="summaryTech">—</strong></div>
+                                    <div><span class="text-muted text-small">MARKETING</span><br><span class="text-muted" id="summaryMarketing">Pending</span></div>
+                                </div>
+                                <button class="btn-primary" style="margin-top:16px;" id="continueToRisks" disabled>Continue Building →</button>
+                            </div>
+                        </div>
+
+                        <div class="card" style="background:#F8FAFC;">
+                            <div style="display:flex;gap:12px;align-items:center;">
+                                <div style="background:#1E3A8A;width:48px;height:48px;border-radius:60px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px;">AI</div>
+                                <div>
+                                    <p style="font-weight:500;" id="aiChatMessage">I'm processing your thoughts to make sure I've got the full picture.</p>
+                                    <p class="text-muted text-small" id="aiChatSub">Share your idea and I'll help you refine it.</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="tag">transparency</span><span class="tag">user control</span></div>
+                            <p class="text-muted text-small" style="margin-top:12px;">💡 I'm breaking down your thoughts to make sure I've got the full picture.</p>
+                            <div style="margin-top:12px;padding:8px 12px;background:#E6F7F5;border-radius:12px;font-size:12px;color:#0D7A6E;">
+                                🤖 Powered by Groq AI (Mixtral-8x7B)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== RISKS ===== -->
+                <div id="page-risks" class="page">
+                    <button onclick="navigateTo('clarify')" style="background:none;border:none;color:#64748B;cursor:pointer;margin-bottom:16px;">← Back to Clarification</button>
+                    <h2 class="section-title">🧩 Let's Check What Could Go Wrong</h2>
+                    <p class="section-sub">A proactive deep-dive into your project's assumptions. Identify bottlenecks before they become obstacles.</p>
+
+                    <div class="card" style="background:#F1F5F9;margin-bottom:16px;">
+                        <h4 style="color:#1E3A8A;margin-bottom:8px;">AI Analysis Methodology</h4>
+                        <ol style="list-style:none;padding:0;font-size:14px;color:#475569;">
+                            <li style="padding:6px 0;border-bottom:1px solid #E2E8F0;"><strong>1. Data Ingestion</strong> — Scanning your project proposal, tech stack, and timeline constraints.</li>
+                            <li style="padding:6px 0;border-bottom:1px solid #E2E8F0;"><strong>2. Pattern Matching</strong> — Comparing your variables against 5,000+ academic project failure modes.</li>
+                            <li style="padding:6px 0;"><strong>3. Risk Weighting</strong> — Assigning impact scores and suggesting mitigation strategies.</li>
+                        </ol>
+                    </div>
+
+                    <div class="grid-2" id="riskContainer">
+                        <p class="text-muted" style="grid-column:1/-1;text-align:center;padding:40px 0;">No risks analyzed yet. Clarify your idea first.</p>
+                    </div>
+
+                    <div class="card" style="background:#D1FAE5;border-left:6px solid #10B981;margin-top:16px;">
+                        <div class="flex-between">
+                            <span class="tag" style="background:#10B981;color:white;">Core Problem Identified</span>
+                            <span>✅</span>
+                        </div>
+                        <p id="coreProblemText"><span class="text-muted">Clarify your idea to identify the core problem.</span></p>
+                        <p class="text-muted text-small" style="margin-top:6px;font-weight:500;">You are in control — decide what to do next.</p>
+                        <div class="flex-row" style="margin-top:12px;">
+                            <button class="btn-primary" onclick="generateRoadmap()">Generate Action Plan</button>
+                            <button class="btn-outline" onclick="showToast('💾 Risk assessment saved!')">Save for Later</button>
+                            <button class="btn-outline" onclick="regenerateRisks()">🔄 Re-analyze</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:16px;padding:12px 16px;background:#F8FAFC;border-radius:16px;border:1px solid #E2E8F0;">
+                        <div class="flex-between">
+                            <span style="font-weight:600;color:#1E3A8A;">Workshop Progress</span>
+                            <span class="tag">in progress</span>
+                        </div>
+                        <p style="font-style:italic;color:#475569;margin-top:4px;font-size:14px;">"Risk is what's left when you think you've thought of everything." — Carl Richards</p>
+                    </div>
+                </div>
+
+                <!-- ===== ROADMAP PAGE (TREE STYLE) ===== -->
+                <div id="page-roadmap" class="page">
+                    <button onclick="navigateTo('risks')" style="background:none;border:none;color:#64748B;cursor:pointer;margin-bottom:16px;">← Back to Risks</button>
+
+                    <div class="roadmap-header">
+                        <h2 class="section-title">🗺️ Dynamic Growth Roadmap</h2>
+                        <p class="section-sub">A strategic 90-day plan to launch your professional presence and secure your first internship.</p>
+                    </div>
+
+                    <!-- FIRST SIMPLE STEP - Prominent -->
+                    <div class="card first-step-card" style="background:linear-gradient(135deg, #F0FDF4, #D1FAE5);border:2px solid #14B8A6;margin-bottom:24px;">
+                        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                            <div style="background:#14B8A6;padding:8px 20px;border-radius:60px;display:inline-block;">
+                                <span style="color:white;font-weight:700;font-size:14px;">⭐ FIRST SIMPLE STEP</span>
+                            </div>
+                            <span style="font-weight:700;font-size:18px;color:#065F46;" id="firstStepText">Buy domain name for Priya's Portfolio</span>
+                            <span class="chip" style="background:#14B8A6;color:white;">Estimated time: 10 minutes</span>
+                            <span class="text-muted text-small" style="font-weight:500;">This small victory builds momentum.</span>
+                            <button class="btn-success" style="font-size:12px;padding:4px 16px;" onclick="showToast('✅ First step marked as complete!')">Mark Complete</button>
+                        </div>
+                    </div>
+
+                    <!-- TREE ROADMAP -->
+                    <div class="tree-roadmap" id="treeRoadmap">
+                        <!-- Phase 1: Day 0-30 -->
+                        <div class="tree-phase" id="phase1">
+                            <div class="phase-header" onclick="togglePhase('phase1')">
+                                <div class="phase-indicator">
+                                    <span class="phase-number">1</span>
+                                    <span class="phase-line"></span>
+                                </div>
+                                <div class="phase-title-group">
+                                    <span class="phase-label">Day 0 - 30</span>
+                                    <span class="tag phase-tag">Foundation & Core Assets</span>
+                                    <span class="phase-toggle">▼</span>
+                                </div>
+                            </div>
+                            <div class="phase-content">
+                                <!-- Week 1 -->
+                                <div class="tree-week" id="week1">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('week1')">
+                                            <span class="week-number">Week 1</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks">
+                                            <div class="task-item">
+                                                <span class="task-bullet">●</span>
+                                                <div>
+                                                    <span class="task-title">Digital Presence Launch</span>
+                                                    <p class="task-desc">Secure domain, set up hosting, and initialize a basic placeholder landing page with contact info.</p>
+                                                </div>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Choose a domain name</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Set up hosting provider</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Create landing page</span>
+                                            </div>
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('✅ Week 1 marked complete!')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Week 3 -->
+                                <div class="tree-week" id="week3">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('week3')">
+                                            <span class="week-number">Week 3</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks">
+                                            <div class="task-item">
+                                                <span class="task-bullet">●</span>
+                                                <div>
+                                                    <span class="task-title">Portfolio Content Audit</span>
+                                                    <p class="task-desc">Select 3-5 best academic projects. Document the "Internal Reasoning" and problem-solving process for each.</p>
+                                                </div>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Review all academic projects</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Document problem-solving process</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Select top 3-5 projects</span>
+                                            </div>
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('✅ Week 3 marked complete!')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2: Day 31-60 -->
+                        <div class="tree-phase" id="phase2">
+                            <div class="phase-header" onclick="togglePhase('phase2')">
+                                <div class="phase-indicator">
+                                    <span class="phase-number">2</span>
+                                    <span class="phase-line"></span>
+                                </div>
+                                <div class="phase-title-group">
+                                    <span class="phase-label">Day 31 - 60</span>
+                                    <span class="tag phase-tag">Refinement & Networking</span>
+                                    <span class="phase-toggle">▼</span>
+                                </div>
+                            </div>
+                            <div class="phase-content">
+                                <!-- Week 6 -->
+                                <div class="tree-week" id="week6">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('week6')">
+                                            <span class="week-number">Week 6</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks">
+                                            <div class="task-item">
+                                                <span class="task-bullet">●</span>
+                                                <div>
+                                                    <span class="task-title">Visual Identity Polish</span>
+                                                    <p class="task-desc">Standardize typography and color across the portfolio. Ensure a "Breathable Interface" for all project case studies.</p>
+                                                </div>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Define color scheme and typography</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Apply consistent styling</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Review and refine case studies</span>
+                                            </div>
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('✅ Week 6 marked complete!')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Week 8 -->
+                                <div class="tree-week" id="week8">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('week8')">
+                                            <span class="week-number">Week 8</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks">
+                                            <div class="task-item">
+                                                <span class="task-bullet">●</span>
+                                                <div>
+                                                    <span class="task-title">Beta Feedback Loop</span>
+                                                    <p class="task-desc">Share private link with 3 mentors. Gather feedback on navigation and project clarity.</p>
+                                                </div>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Share with mentors</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Collect and organize feedback</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Implement improvements</span>
+                                            </div>
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('✅ Week 8 marked complete!')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 3: Day 61-90 -->
+                        <div class="tree-phase" id="phase3">
+                            <div class="phase-header" onclick="togglePhase('phase3')">
+                                <div class="phase-indicator">
+                                    <span class="phase-number">3</span>
+                                    <span class="phase-line"></span>
+                                </div>
+                                <div class="phase-title-group">
+                                    <span class="phase-label">Day 61 - 90</span>
+                                    <span class="tag phase-tag">Market Launch</span>
+                                    <span class="phase-toggle">▼</span>
+                                </div>
+                            </div>
+                            <div class="phase-content">
+                                <!-- Day 75: Full Launch -->
+                                <div class="tree-week" id="weekLaunch">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('weekLaunch')">
+                                            <span class="week-number" style="color:#14B8A6;">🚀 Day 75</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks">
+                                            <div class="task-item">
+                                                <span class="task-bullet" style="color:#14B8A6;">●</span>
+                                                <div>
+                                                    <span class="task-title" style="color:#14B8A6;">Full Launch</span>
+                                                    <p class="task-desc">Set your portfolio to public and index it on search engines.</p>
+                                                </div>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Make portfolio public</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Submit to search engines</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Share on LinkedIn</span>
+                                            </div>
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('🚀 Launch marked complete!')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Day 85: Application Push -->
+                                <div class="tree-week" id="weekApply">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('weekApply')">
+                                            <span class="week-number" style="color:#F59E0B;">🎯 Day 85</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks">
+                                            <div class="task-item">
+                                                <span class="task-bullet" style="color:#F59E0B;">●</span>
+                                                <div>
+                                                    <span class="task-title" style="color:#F59E0B;">Application Push</span>
+                                                    <p class="task-desc">Apply to 10 dream internships using your custom URL in the resume header.</p>
+                                                </div>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Update resume with portfolio URL</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Apply to 10 internships</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Track applications</span>
+                                            </div>
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('🎯 Application push marked complete!')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Day 90: Success Goal -->
+                                <div class="tree-week" id="weekSuccess">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('weekSuccess')">
+                                            <span class="week-number" style="color:#10B981;">🏆 Day 90</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks">
+                                            <div class="task-item">
+                                                <span class="task-bullet" style="color:#10B981;">●</span>
+                                                <div>
+                                                    <span class="task-title" style="color:#10B981;">Success Goal</span>
+                                                    <p class="task-desc">Secure at least 3 interview invitations from top-tier recruiters.</p>
+                                                </div>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Follow up on applications</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Prepare for interviews</span>
+                                            </div>
+                                            <div class="task-item subtask">
+                                                <span class="task-bullet">○</span>
+                                                <span class="task-title">Celebrate success! 🎉</span>
+                                            </div>
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('🏆 Success goal marked complete! Congratulations! 🎉')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Project Strategy Thought Process -->
+                    <div class="card" style="background:#F1F5F9;margin-top:24px;">
+                        <h4 style="color:#1E3A8A;margin-bottom:12px;">AI Project Strategy Thought Process</h4>
+                        <ol style="list-style:none;padding:0;" id="strategyThoughts">
+                            <li style="padding:10px 0;border-bottom:1px solid #E2E8F0;">
+                                <strong style="color:#1E3A8A;">1. MARKET ANALYSIS</strong><br>
+                                <span class="text-muted text-small">We analyzed current internship trends in Priya's field. Recruiters prioritize personal brands over generic LinkedIn profiles, leading to the "Portfolio First" strategy.</span>
+                            </li>
+                            <li style="padding:10px 0;border-bottom:1px solid #E2E8F0;">
+                                <strong style="color:#1E3A8A;">2. MOMENTUM BUILDING</strong><br>
+                                <span class="text-muted text-small">The "Simple First Step" (Domain Purchase) was selected because it has the highest "completion-to-impact" ratio, mathematically increasing the likelihood of user retention by 40%.</span>
+                            </li>
+                            <li style="padding:10px 0;">
+                                <strong style="color:#1E3A8A;">3. REFINEMENT PHASE</strong><br>
+                                <span class="text-muted text-small">The 60-day mark focuses on refinement because quality in the top 10% of portfolios generates 80% of the interview results in this competitive academic landscape.</span>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;">
+                        <button class="btn-primary" onclick="navigateTo('dashboard')">← Back to Dashboard</button>
+                        <button class="btn-outline" onclick="navigateTo('risks')">Review Risks Again</button>
+                        <button class="btn-success" onclick="showToast('📋 Roadmap exported as PDF (simulated)')">📄 Export Plan</button>
+                        <button class="btn-outline" onclick="toggleAllPhases()">🔄 Expand/Collapse All</button>
+                    </div>
+
+                    <div class="footer" style="margin-top:30px;">© 2026 Clarity Compass. Built for academic excellence.</div>
+                </div>
+
+                <!-- ===== MY IDEAS ===== -->
+                <div id="page-ideas" class="page">
+                    <div class="flex-between" style="margin-bottom:16px;">
+                        <h2 class="section-title" style="margin-bottom:0;">My Ideas</h2>
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <span class="stat-badge" id="totalIdeas">TOTAL 0</span>
+                            <span class="stat-badge" id="activeDrafts">ACTIVE 0</span>
+                            <button class="btn-primary" onclick="navigateTo('new-idea')" style="font-size:12px;padding:6px 16px;">+ New</button>
+                        </div>
+                    </div>
+                    <div class="idea-grid" id="ideasGrid">
+                        <div class="card" style="grid-column:1/-1;text-align:center;padding:40px;">
+                            <p class="text-muted">No ideas yet. Start your first project!</p>
+                            <button class="btn-primary" onclick="navigateTo('new-idea')" style="margin-top:12px;">+ New Project</button>
+                        </div>
+                    </div>
+                    <div class="footer">© 2026 Clarity Compass. Built for academic excellence.</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG (YOUR CONFIG)
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDT6Hvevez8PwyRqF4-_85c_2lXpzVpeVM",
+            authDomain: "claritycompass-f0179.firebaseapp.com",
+            projectId: "claritycompass-f0179",
+            storageBucket: "claritycompass-f0179.firebasestorage.app",
+            messagingSenderId: "171542816264",
+            appId: "1:171542816264:web:0a6f8e6e4f2d701f8913bd",
+            measurementId: "G-W10BC0YFLR"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ============================================================
+        // 🚀 BACKEND API URL (CHANGE TO YOUR SERVER URL)
+        // ============================================================
+        const API_URL = 'http://localhost:3001/api/analyze';
+
+        // ============================================================
+        // STATE
+        // ============================================================
+        let currentUser = null;
+        let currentIdeaId = null;
+        let currentIdeaData = null;
+        let allIdeas = [];
+        let generatedRisks = [];
+        let generatedRoadmap = null;
+        let isGroqAvailable = false;
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ============================================================
+        // NAVIGATION - FIXED!
+        // ============================================================
+        function navigateTo(page) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            // Show the target page
+            const target = document.getElementById('page-' + page);
+            if (target) {
+                target.classList.add('active');
+            }
+            
+            // Update nav links
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                if (a.dataset.page === page) a.classList.add('active');
+            });
+            
+            window.scrollTo(0, 0);
+        }
+
+        // ============================================================
+        // NAVIGATION EVENT LISTENERS - FIXED!
+        // ============================================================
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.dataset.page;
+                if (page) {
+                    navigateTo(page);
+                }
+            });
+        });
+
+        // ============================================================
+        // CHECK API STATUS
+        // ============================================================
+        async function checkAPIStatus() {
+            const statusEl = document.getElementById('apiStatus');
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea: 'ping' })
+                });
+                if (response.ok) {
+                    isGroqAvailable = true;
+                    statusEl.textContent = '✅ Groq AI Online';
+                    statusEl.className = 'api-status online';
+                    document.getElementById('apiStatusText').textContent = '✅ Using Groq AI';
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (e) {
+                isGroqAvailable = false;
+                statusEl.textContent = '⚠️ Using Fallback AI';
+                statusEl.className = 'api-status offline';
+                document.getElementById('apiStatusText').textContent = '⚠️ Using Fallback AI';
+                console.warn('Groq API unavailable, using fallback AI');
+            }
+        }
+
+        // ============================================================
+        // AUTH
+        // ============================================================
+        function showAuthError(msg) {
+            const el = document.getElementById('authError');
+            el.textContent = msg;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 5000);
+        }
+
+        document.getElementById('showSignup').onclick = () => {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.remove('hidden');
+            document.getElementById('authError').classList.add('hidden');
+        };
+        document.getElementById('showLogin').onclick = () => {
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('authError').classList.add('hidden');
+        };
+
+        document.getElementById('loginBtn').onclick = async () => {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) { showAuthError('Please enter email and password'); return; }
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (e) { showAuthError(e.message); }
+        };
+
+        document.getElementById('signupBtn').onclick = async () => {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            if (!name || !email || !password) { showAuthError('Please fill in all fields'); return; }
+            if (password.length < 6) { showAuthError('Password must be at least 6 characters'); return; }
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, password);
+                await cred.user.updateProfile({ displayName: name });
+            } catch (e) { showAuthError(e.message); }
+        };
+
+        document.getElementById('signOutBtn').onclick = async () => {
+            await auth.signOut();
+        };
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authPage').classList.add('hidden');
+                document.getElementById('appPage').classList.remove('hidden');
+                document.getElementById('userEmailDisplay').textContent = user.email;
+                document.getElementById('greeting').textContent = `Hi ${user.displayName || user.email} 👋`;
+                checkAPIStatus();
+                loadIdeas();
+            } else {
+                currentUser = null;
+                document.getElementById('authPage').classList.remove('hidden');
+                document.getElementById('appPage').classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('authError').classList.add('hidden');
+            }
+        });
+
+        // ============================================================
+        // LOAD IDEAS FROM FIRESTORE
+        // ============================================================
+        async function loadIdeas() {
+            if (!currentUser) return;
+            try {
+                const snapshot = await db.collection('ideas')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                allIdeas = [];
+                snapshot.forEach(doc => {
+                    allIdeas.push({ id: doc.id, ...doc.data() });
+                });
+                renderIdeas();
+                updateDashboard();
+            } catch (e) {
+                console.error('Load ideas error:', e);
+                showToast('Error loading ideas');
+            }
+        }
+
+        // ============================================================
+        // RENDER IDEAS IN MY IDEAS PAGE
+        // ============================================================
+        function renderIdeas() {
+            const grid = document.getElementById('ideasGrid');
+            const total = document.getElementById('totalIdeas');
+            const drafts = document.getElementById('activeDrafts');
+
+            total.textContent = `TOTAL ${allIdeas.length}`;
+            const active = allIdeas.filter(i => (i.progress || 0) < 100).length;
+            drafts.textContent = `ACTIVE ${active}`;
+
+            if (allIdeas.length === 0) {
+                grid.innerHTML = `
+                            <div class="card" style="grid-column:1/-1;text-align:center;padding:40px;">
+                                <p class="text-muted">No ideas yet. Start your first project!</p>
+                                <button class="btn-primary" onclick="navigateTo('new-idea')" style="margin-top:12px;">+ New Project</button>
+                            </div>
+                        `;
+                return;
+            }
+
+            grid.innerHTML = allIdeas.map(idea => `
+                        <div class="idea-card" onclick="openIdea('${idea.id}')">
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteIdea('${idea.id}')">✕</button>
+                            <strong>${idea.title || 'Untitled'}</strong><br>
+                            <span class="text-muted text-small">${idea.context || 'General'}</span>
+                            <div style="margin-top:8px;">
+                                <span class="text-muted text-small">${(idea.progress || 0) === 100 ? 'Completed' : 'In Progress'}</span>
+                                <div class="progress-bar"><div class="progress-fill" style="width:${idea.progress || 0}%"></div></div>
+                                <div class="flex-between" style="margin-top:4px;">
+                                    <span class="text-muted text-small">${idea.progress || 0}%</span>
+                                    <span class="text-muted text-small">${idea.edited || 'Recently'}</span>
+                                </div>
+                            </div>
+                            ${idea.usesGroq ? '<span class="chip" style="font-size:9px;margin-top:4px;">🤖 Groq AI</span>' : ''}
+                        </div>
+                    `).join('');
+        }
+
+        // ============================================================
+        // UPDATE DASHBOARD
+        // ============================================================
+        function updateDashboard() {
+            const recentList = document.getElementById('recentIdeasList');
+            const progressStat = document.getElementById('progressStat');
+            const aiInsight = document.getElementById('aiInsight');
+
+            if (allIdeas.length === 0) {
+                recentList.innerHTML = '<p class="text-muted" style="padding:16px 0;">No ideas yet. Start your first project!</p>';
+                progressStat.textContent = '0%';
+                aiInsight.textContent = '“I\'m ready to help you build your first idea. Click \'Start New Idea\' to begin!”';
+                document.getElementById('activeHours').textContent = '0 hrs';
+                return;
+            }
+
+            const avg = Math.round(allIdeas.reduce((s, i) => s + (i.progress || 0), 0) / allIdeas.length);
+            progressStat.textContent = avg + '%';
+            document.getElementById('activeHours').textContent = (avg / 10).toFixed(1) + ' hrs';
+
+            const recent = allIdeas.slice(0, 2);
+            recentList.innerHTML = recent.map(idea => `
+                        <div class="flex-between" style="padding:10px 0;border-bottom:1px solid #EDF2F7;cursor:pointer;" onclick="openIdea('${idea.id}')">
+                            <div><strong>${idea.title || 'Untitled'}</strong><br><span class="text-muted text-small">${idea.context || 'General'}</span></div>
+                            <span class="text-muted text-small">${idea.edited || 'Recently'}</span>
+                        </div>
+                    `).join('');
+
+            aiInsight.textContent = `“You're making great progress on ${allIdeas.length} idea${allIdeas.length > 1 ? 's' : ''}. Keep going! 🚀”`;
+        }
+
+        // ============================================================
+        // DELETE IDEA
+        // ============================================================
+        async function deleteIdea(id) {
+            if (!confirm('Delete this idea?')) return;
+            try {
+                await db.collection('ideas').doc(id).delete();
+                allIdeas = allIdeas.filter(i => i.id !== id);
+                renderIdeas();
+                updateDashboard();
+                showToast('🗑️ Idea deleted');
+            } catch (e) {
+                showToast('Error deleting idea');
+            }
+        }
+
+        // ============================================================
+        // OPEN IDEA
+        // ============================================================
+        function openIdea(id) {
+            const idea = allIdeas.find(i => i.id === id);
+            if (idea) {
+                currentIdeaId = id;
+                currentIdeaData = idea;
+                showToast(`📂 Opening "${idea.title || 'Untitled'}"`);
+                navigateTo('clarify');
+                if (idea.reasoning) {
+                    displayExistingReasoning(idea);
+                }
+            }
+        }
+
+        // ============================================================
+        // DISPLAY EXISTING REASONING
+        // ============================================================
+        function displayExistingReasoning(idea) {
+            const container = document.getElementById('reasoningContainer');
+            container.innerHTML = '';
+
+            if (idea.reasoning && idea.reasoning.length > 0) {
+                idea.reasoning.forEach((step, i) => {
+                    const item = document.createElement('div');
+                    item.className = 'reasoning-item';
+                    item.innerHTML = `
+                                <div class="reasoning-number">${i + 1}</div>
+                                <div class="reasoning-content">
+                                    <strong>${step.title}</strong>
+                                    <p>${step.description}</p>
+                                </div>
+                            `;
+                    container.appendChild(item);
+                });
+                document.getElementById('projectProgress').textContent = `Project Phase Analysis · ${idea.progress || 66}% Complete`;
+                document.getElementById('summaryTitle').textContent = idea.title || '—';
+                document.getElementById('summaryContext').textContent = idea.context || '—';
+                document.getElementById('summaryTech').textContent = idea.tech || '—';
+                document.getElementById('summaryMarketing').textContent = idea.marketing || 'Pending';
+                document.getElementById('continueToRisks').disabled = false;
+                generatedRisks = idea.risks || [];
+                generatedRoadmap = idea.roadmap || null;
+            }
+        }
+
+        // ============================================================
+        // USE TEMPLATE
+        // ============================================================
+        async function useTemplate() {
+            if (!currentUser) return;
+            const ideaData = {
+                userId: currentUser.uid,
+                title: 'Academic Research Paper',
+                context: 'Literature review & data analysis',
+                tech: 'Python + Jupyter + PostgreSQL',
+                marketing: 'Target academic journals and conferences',
+                rawInput: 'Academic research paper project',
+                progress: 10,
+                edited: 'Just now',
+                usesGroq: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await db.collection('ideas').add(ideaData);
+                showToast('✅ Template loaded!');
+                await loadIdeas();
+                navigateTo('ideas');
+            } catch (e) {
+                showToast('Error loading template');
+            }
+        }
+
+        // ============================================================
+        // VOICE RECORDING
+        // ============================================================
+        function startVoiceRecording() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                showToast('🎤 Listening... Speak your idea now.');
+                recognition.start();
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    const input = document.getElementById('ideaInput');
+                    input.value = input.value + (input.value ? ' ' : '') + transcript;
+                    showToast('✅ Voice captured! Review and edit if needed.');
+                };
+
+                recognition.onerror = () => {
+                    showToast('❌ Could not hear you. Please type your idea.');
+                };
+            } else {
+                showToast('🎤 Voice recognition not supported in this browser.');
+            }
+        }
+
+        // ============================================================
+        // FILE UPLOAD
+        // ============================================================
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const input = document.getElementById('ideaInput');
+                input.value = input.value + (input.value ? '\n\n' : '') + '[Uploaded: ' + file.name + ']\n' + content.substring(0, 500);
+                showToast('✅ File uploaded successfully!');
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ============================================================
+        // 🧠 AI PROCESSING WITH GROQ API
+        // ============================================================
+        async function processIdea(input) {
+            const reasoningContainer = document.getElementById('reasoningContainer');
+            const thinkingIndicator = document.getElementById('thinkingIndicator');
+            const summaryTitle = document.getElementById('summaryTitle');
+            const summaryContext = document.getElementById('summaryContext');
+            const summaryTech = document.getElementById('summaryTech');
+            const summaryMarketing = document.getElementById('summaryMarketing');
+            const aiChatMessage = document.getElementById('aiChatMessage');
+            const projectProgress = document.getElementById('projectProgress');
+            const continueBtn = document.getElementById('continueToRisks');
+
+            thinkingIndicator.style.display = 'flex';
+            reasoningContainer.innerHTML = '';
+            reasoningContainer.appendChild(thinkingIndicator);
+            continueBtn.disabled = true;
+            aiChatMessage.textContent = '🤔 Connecting to Groq AI...';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea: input })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Groq API unavailable');
+                }
+
+                const data = await response.json();
+                const reasoningSteps = data.reasoning || generateFallbackReasoning(input);
+                const summary = data.summary || generateFallbackSummary(input);
+                const risks = data.risks || generateFallbackRisks(input);
+                const roadmap = data.roadmap || generateFallbackRoadmap(input);
+
+                window._generatedRoadmap = roadmap;
+                generatedRoadmap = roadmap;
+
+                await displayAIResults(reasoningSteps, summary, risks, roadmap, input, true);
+                showToast('✅ Groq AI analysis complete!');
+                aiChatMessage.textContent = '✅ All set! Ready to check for risks.';
+
+            } catch (error) {
+                console.warn('Groq API failed, using fallback AI:', error.message);
+                showToast('⚠️ Using fallback AI (Groq unavailable)', 'warning');
+                aiChatMessage.textContent = '⚠️ Using fallback AI mode.';
+
+                const reasoningSteps = generateFallbackReasoning(input);
+                const summary = generateFallbackSummary(input);
+                const risks = generateFallbackRisks(input);
+                const roadmap = generateFallbackRoadmap(input);
+
+                window._generatedRoadmap = roadmap;
+                generatedRoadmap = roadmap;
+
+                await displayAIResults(reasoningSteps, summary, risks, roadmap, input, false);
+                showToast('✅ Analysis complete (fallback mode)');
+                aiChatMessage.textContent = '✅ All set! Ready to check for risks.';
+            }
+        }
+
+        // ============================================================
+        // DISPLAY AI RESULTS
+        // ============================================================
+        async function displayAIResults(reasoningSteps, summary, risks, roadmap, input, usesGroq) {
+            const reasoningContainer = document.getElementById('reasoningContainer');
+            const thinkingIndicator = document.getElementById('thinkingIndicator');
+            const summaryTitle = document.getElementById('summaryTitle');
+            const summaryContext = document.getElementById('summaryContext');
+            const summaryTech = document.getElementById('summaryTech');
+            const summaryMarketing = document.getElementById('summaryMarketing');
+            const projectProgress = document.getElementById('projectProgress');
+            const continueBtn = document.getElementById('continueToRisks');
+            const aiChatMessage = document.getElementById('aiChatMessage');
+
+            await delay(600);
+            thinkingIndicator.style.display = 'none';
+
+            // Display reasoning steps with typing
+            for (let i = 0; i < reasoningSteps.length; i++) {
+                const step = reasoningSteps[i];
+                const item = document.createElement('div');
+                item.className = 'reasoning-item';
+                item.innerHTML = `
+                            <div class="reasoning-number">${i + 1}</div>
+                            <div class="reasoning-content">
+                                <strong>${step.title}</strong>
+                                <p><span class="typing-text"></span><span class="typing-cursor"></span></p>
+                            </div>
+                        `;
+                reasoningContainer.appendChild(item);
+
+                const textSpan = item.querySelector('.typing-text');
+                await typeText(textSpan, step.description, 25);
+                const cursor = item.querySelector('.typing-cursor');
+                cursor.style.display = 'none';
+
+                const progress = Math.round(((i + 1) / reasoningSteps.length) * 100);
+                projectProgress.textContent = `Project Phase Analysis · ${progress}% Complete`;
+                aiChatMessage.textContent = ['🧠 Understanding your idea...', '🎯 Seeing the bigger picture...', '⚙️ Mapping requirements...',
+                    '✅ Analysis complete!'
+                ][i] || '✅ Done!';
+            }
+
+            // Update summary
+            summaryTitle.textContent = summary.title || 'Project Idea';
+            summaryContext.textContent = summary.context || 'General';
+            summaryTech.textContent = summary.tech || 'Cloud-based';
+            summaryMarketing.textContent = summary.marketing || 'Pending';
+
+            // ✅ Store everything
+            currentIdeaData = {
+                title: summary.title || 'Project Idea',
+                context: summary.context || 'General',
+                tech: summary.tech || 'Cloud-based',
+                marketing: summary.marketing || 'Pending',
+                rawInput: input,
+                reasoning: reasoningSteps,
+                risks: risks,
+                roadmap: roadmap,
+                usesGroq: usesGroq
+            };
+
+            generatedRisks = risks;
+            generatedRoadmap = roadmap;
+            window._generatedRoadmap = roadmap;
+            window._currentIdeaData = currentIdeaData;
+
+            // ✅ SAVE TO FIRESTORE
+            try {
+                const ideaData = {
+                    userId: currentUser.uid,
+                    title: summary.title || 'Project Idea',
+                    context: summary.context || 'General',
+                    tech: summary.tech || 'Cloud-based',
+                    marketing: summary.marketing || 'Pending',
+                    rawInput: input,
+                    progress: 66,
+                    edited: 'Just now',
+                    reasoning: reasoningSteps,
+                    risks: risks,
+                    roadmap: roadmap,
+                    usesGroq: usesGroq,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                const docRef = await db.collection('ideas').add(ideaData);
+                currentIdeaId = docRef.id;
+                currentIdeaData = { id: docRef.id, ...ideaData };
+                continueBtn.disabled = false;
+                
+                // ✅ Refresh the ideas list
+                await loadIdeas();
+            } catch (e) {
+                console.error('Save error:', e);
+                showToast('Error saving idea');
+            }
+        }
+
+        // ============================================================
+        // FALLBACK FUNCTIONS
+        // ============================================================
+        function generateFallbackReasoning(input) {
+            return [
+                { title: "Understanding your idea", description: `Analyzing the core problem: ${input.substring(0, 60)}... Identifying key pain points and user needs.` },
+                { title: "Clarifying the goal", description: `Defining the scope and success criteria. ${input.includes('visa') ? 'This appears to be a compliance-focused solution.' : input.includes('app') ? 'This looks like a mobile-first approach.' : 'This seems to be a full-stack application.'}` },
+                { title: "Identifying key tasks", description: `Mapping out technical requirements, user flows, and critical features. ${input.includes('student') ? 'Student data privacy will be a priority.' : 'Security and scalability are key considerations.'}` },
+                { title: "Assessing feasibility", description: `Evaluating technical complexity and resource requirements. Estimated timeline: ${input.length > 50 ? '3-4 months' : '2-3 months'} for MVP.` }
+            ];
+        }
+
+        function generateFallbackSummary(input) {
+            const words = input.toLowerCase();
+            let title = 'Project Idea',
+                context = 'General',
+                tech = 'Cloud-based';
+            if (words.includes('visa') || words.includes('international')) {
+                title = 'VisaFlow Student Portal';
+                context = 'F-1 / J-1 visa compliance';
+                tech = 'Cloud + Encryption + API Integrations';
+            } else if (words.includes('portfolio') || words.includes('website')) {
+                title = 'Personal Brand Website';
+                context = 'Professional online presence';
+                tech = 'Next.js + Tailwind + Vercel';
+            } else if (words.includes('research') || words.includes('academic')) {
+                title = 'Academic Research Platform';
+                context = 'Literature review & data analysis';
+                tech = 'Python + Jupyter + PostgreSQL';
+            } else if (words.includes('app') || words.includes('mobile')) {
+                title = 'Mobile App Development';
+                context = 'Cross-platform user experience';
+                tech = 'React Native + Firebase';
+            } else {
+                const arr = input.split(' ').slice(0, 3);
+                title = arr.join(' ') + ' Project';
+                context = 'Custom solution development';
+                tech = 'Modern full-stack architecture';
+            }
+            return { title, context, tech, marketing: 'Pending — define your target audience' };
+        }
+
+        function generateFallbackRisks(input) {
+            const text = input.toLowerCase();
+            const risks = [];
+
+            const isVisa = text.includes('visa') || text.includes('international') || text.includes('student');
+            const isApp = text.includes('app') || text.includes('mobile') || text.includes('ios') || text.includes('android');
+            const isResearch = text.includes('research') || text.includes('academic') || text.includes('paper');
+            const isPortfolio = text.includes('portfolio') || text.includes('website') || text.includes('personal brand');
+
+            if (isVisa) {
+                risks.push({
+                    priority: 'high',
+                    title: 'Visa Compliance & Documentation',
+                    description: 'Visa applications require precise documentation and strict adherence to deadlines. Missing a single document or deadline can delay the entire process by weeks or months.',
+                    recommendation: 'Create a detailed compliance checklist with all deadlines. Consult with an immigration advisor early in the process.'
+                });
+                risks.push({
+                    priority: 'medium',
+                    title: 'Data Privacy & Security',
+                    description: 'Handling sensitive personal information like passport numbers, financial statements, and visa documents requires strong security measures.',
+                    recommendation: 'Implement end-to-end encryption, use secure cloud storage, and follow data protection regulations like GDPR.'
+                });
+            } else if (isApp) {
+                risks.push({
+                    priority: 'medium',
+                    title: 'Cross-Platform Compatibility',
+                    description: 'Testing and maintaining the app across iOS and Android devices requires significant time and resources.',
+                    recommendation: 'Start with one platform (iOS or Android) then expand after validating the concept.'
+                });
+                risks.push({
+                    priority: 'high',
+                    title: 'User Retention',
+                    description: 'Mobile apps have high churn rates. Users may download but stop using the app quickly.',
+                    recommendation: 'Focus on user onboarding, push notifications, and continuous feature updates to keep users engaged.'
+                });
+            } else if (isResearch) {
+                risks.push({
+                    priority: 'high',
+                    title: 'Data Collection & Quality',
+                    description: 'Research depends on high-quality data. Poor data collection methods can invalidate your findings.',
+                    recommendation: 'Pilot test your data collection methods, use validated instruments, and document your process thoroughly.'
+                });
+                risks.push({
+                    priority: 'medium',
+                    title: 'Time Management',
+                    description: 'Research projects often take longer than expected due to unexpected challenges.',
+                    recommendation: 'Build buffer time into your schedule, set realistic milestones, and review progress weekly.'
+                });
+            } else if (isPortfolio) {
+                risks.push({
+                    priority: 'medium',
+                    title: 'Technical Issues',
+                    description: 'Website bugs, broken links, or slow loading times can create a poor impression.',
+                    recommendation: 'Test thoroughly across devices, use a reliable hosting provider, and set up monitoring.'
+                });
+                risks.push({
+                    priority: 'high',
+                    title: 'Standing Out',
+                    description: 'Many students have portfolios. Making yours stand out requires creativity and strategic positioning.',
+                    recommendation: 'Define your unique value proposition, tell compelling stories, and showcase your personality.'
+                });
+            }
+
+            // General risks
+            risks.push({
+                priority: 'medium',
+                title: 'Scope Creep',
+                description: 'Projects often expand beyond the original plan, leading to delays and burnout.',
+                recommendation: 'Define MVP features clearly, say "no" to non-essential additions, and prioritize ruthlessly.'
+            });
+            risks.push({
+                priority: 'medium',
+                title: 'Time Management & Deadlines',
+                description: 'Without proper planning, projects can fall behind schedule, causing stress and missed opportunities.',
+                recommendation: 'Use a project management tool, break work into small tasks, and review progress daily.'
+            });
+
+            return risks.slice(0, 4);
+        }
+
+        // ============================================================
+        // FALLBACK ROADMAP
+        // ============================================================
+        function generateFallbackRoadmap(input) {
+            const text = input.toLowerCase();
+            const isVisa = text.includes('visa') || text.includes('international') || text.includes('student');
+            const isApp = text.includes('app') || text.includes('mobile') || text.includes('ios') || text.includes('android');
+            const isResearch = text.includes('research') || text.includes('academic') || text.includes('paper');
+            const isPortfolio = text.includes('portfolio') || text.includes('website') || text.includes('personal brand');
+
+            let firstStep, phase1, phase2, phase3;
+
+            if (isVisa) {
+                firstStep = 'Research visa requirements and create a compliance checklist';
+                phase1 = [
+                    { week: 'Week 1: Foundation Research', tasks: ['Research F-1 and J-1 visa requirements', 'Create compliance checklist', 'Interview 5 international students'] },
+                    { week: 'Week 2: User Experience Design', tasks: ['Create user personas', 'Design user flow diagrams', 'Build wireframes'] },
+                    { week: 'Week 3: Development Setup', tasks: ['Set up environment', 'Choose tech stack', 'Design database schema'] },
+                    { week: 'Week 4: Core Features', tasks: ['Build document upload', 'Implement tracking', 'Create dashboard'] }
+                ];
+                phase2 = [
+                    { week: 'Week 5: Notifications', tasks: ['Implement reminder system', 'Build advisor chat', 'Add FAQ knowledge base'] },
+                    { week: 'Week 6: Testing', tasks: ['Alpha testing with 5 users', 'Fix critical bugs', 'Refine UI/UX'] },
+                    { week: 'Week 7: Refinement', tasks: ['Gather feedback', 'Make improvements', 'Prepare for launch'] }
+                ];
+                phase3 = [
+                    { week: '🚀 Week 10: Beta Launch', tasks: ['Deploy to staging', 'Beta test with 20 users', 'Collect feedback'] },
+                    { week: '🎯 Week 11: Full Launch', tasks: ['Prepare marketing materials', 'Create onboarding guides', 'Final security audit'] },
+                    { week: '🏆 Week 12: Success', tasks: ['Launch publicly! 🎉', 'Monitor user adoption', 'Celebrate your launch!'] }
+                ];
+            } else if (isApp) {
+                firstStep = 'Create user flow diagrams and wireframes';
+                phase1 = [
+                    { week: 'Week 1: Discovery', tasks: ['Define app features', 'Create user personas', 'Competitive analysis'] },
+                    { week: 'Week 2: Design', tasks: ['Create user flows', 'Design wireframes', 'Get feedback'] },
+                    { week: 'Week 3: Setup', tasks: ['Set up React Native', 'Configure Firebase', 'Initialize project'] },
+                    { week: 'Week 4: Screens', tasks: ['Build navigation', 'Create screens', 'Implement auth'] }
+                ];
+                phase2 = [
+                    { week: 'Week 5: Features 1', tasks: ['Implement main features', 'Build profiles', 'Create listings'] },
+                    { week: 'Week 6: Features 2', tasks: ['Add notifications', 'Real-time updates', 'Messaging'] },
+                    { week: 'Week 7: Testing', tasks: ['Test on devices', 'Fix bugs', 'Gather feedback'] }
+                ];
+                phase3 = [
+                    { week: '🚀 Week 10: App Store', tasks: ['Prepare listings', 'Submit to stores', 'Create marketing'] },
+                    { week: '🎯 Week 11: Launch', tasks: ['Monitor metrics', 'Respond to reviews', 'Fix issues'] },
+                    { week: '🏆 Week 12: Growth', tasks: ['Analyze data', 'Plan v2', 'Celebrate! 🎉'] }
+                ];
+            } else if (isResearch) {
+                firstStep = 'Define research question and methodology';
+                phase1 = [
+                    { week: 'Week 1: Foundation', tasks: ['Define research question', 'Literature review', 'Identify gaps'] },
+                    { week: 'Week 2: Methodology', tasks: ['Define methodology', 'Design instruments', 'Get approvals'] },
+                    { week: 'Week 3: Setup', tasks: ['Set up tools', 'Prepare materials', 'Pilot test'] },
+                    { week: 'Week 4: Data Collection', tasks: ['Begin data collection', 'Document process', 'Track progress'] }
+                ];
+                phase2 = [
+                    { week: 'Week 5: Analysis', tasks: ['Clean data', 'Run analysis', 'Create visualizations'] },
+                    { week: 'Week 6: Writing', tasks: ['Draft results', 'Write discussion', 'Connect to question'] },
+                    { week: 'Week 7: Refinement', tasks: ['Get feedback', 'Revise draft', 'Finalize paper'] }
+                ];
+                phase3 = [
+                    { week: '🚀 Week 10: Submission', tasks: ['Finalize paper', 'Format for journal', 'Submit'] },
+                    { week: '🎯 Week 11: Presentation', tasks: ['Create slides', 'Practice', 'Prepare Q&A'] },
+                    { week: '🏆 Week 12: Present', tasks: ['Present research', 'Network', 'Celebrate! 🎉'] }
+                ];
+            } else if (isPortfolio) {
+                firstStep = 'Buy domain name and set up hosting';
+                phase1 = [
+                    { week: 'Week 1: Domain', tasks: ['Buy domain', 'Set up hosting', 'Configure SSL'] },
+                    { week: 'Week 2: Design', tasks: ['Choose template', 'Customize design', 'Get feedback'] },
+                    { week: 'Week 3: Projects', tasks: ['Select 3-5 projects', 'Write case studies', 'Upload media'] },
+                    { week: 'Week 4: Content', tasks: ['Write bio', 'Add resume', 'Connect social'] }
+                ];
+                phase2 = [
+                    { week: 'Week 5: SEO', tasks: ['Optimize for SEO', 'Set up analytics', 'Add meta tags'] },
+                    { week: 'Week 6: Testing', tasks: ['Test on devices', 'Get mentor feedback', 'Make improvements'] },
+                    { week: 'Week 7: Polish', tasks: ['Refine design', 'Add animations', 'Optimize performance'] }
+                ];
+                phase3 = [
+                    { week: '🚀 Week 10: Launch', tasks: ['Make public', 'Share on LinkedIn', 'Monitor traffic'] },
+                    { week: '🎯 Week 11: Applications', tasks: ['Update resume', 'Apply to internships', 'Network'] },
+                    { week: '🏆 Week 12: Success', tasks: ['Track interviews', 'Celebrate! 🎉', 'Plan updates'] }
+                ];
+            } else {
+                firstStep = 'Clarify your idea and define success criteria';
+                phase1 = [
+                    { week: 'Week 1: Clarify', tasks: ['Define project goals', 'Identify audience', 'Research solutions'] },
+                    { week: 'Week 2: Plan', tasks: ['Create timeline', 'Identify resources', 'Break down tasks'] },
+                    { week: 'Week 3: Build', tasks: ['Set up environment', 'Choose stack', 'Create structure'] },
+                    { week: 'Week 4: MVP', tasks: ['Build MVP', 'Test features', 'Get feedback'] }
+                ];
+                phase2 = [
+                    { week: 'Week 5: Develop', tasks: ['Add features', 'Improve UX', 'Implement feedback'] },
+                    { week: 'Week 6: Test', tasks: ['Conduct testing', 'Fix bugs', 'Optimize performance'] },
+                    { week: 'Week 7: Refine', tasks: ['Refine UI/UX', 'Add documentation', 'Finalize launch'] }
+                ];
+                phase3 = [
+                    { week: '🚀 Week 10: Launch', tasks: ['Launch publicly', 'Share on social', 'Monitor feedback'] },
+                    { week: '🎯 Week 11: Grow', tasks: ['Collect feedback', 'Plan improvements', 'Network'] },
+                    { week: '🏆 Week 12: Celebrate', tasks: ['Review success', 'Document learnings', 'Celebrate! 🎉'] }
+                ];
+            }
+
+            return { firstStep, phase1, phase2, phase3 };
+        }
+
+        // ============================================================
+        // GENERATE ROADMAP
+        // ============================================================
+        function generateRoadmap() {
+            let roadmap = generatedRoadmap || window._generatedRoadmap || currentIdeaData?.roadmap;
+
+            if (!roadmap) {
+                showToast('⚠️ Please clarify your idea first.');
+                console.warn('No roadmap found.');
+                return;
+            }
+
+            console.log('✅ Generating roadmap with data:', roadmap);
+
+            document.getElementById('firstStepText').textContent = roadmap.firstStep || 'Take the first step toward your goal';
+            populateTreeRoadmap(roadmap);
+
+            const strategyDiv = document.getElementById('strategyThoughts');
+            const idea = currentIdeaData || window._currentIdeaData;
+            strategyDiv.innerHTML = `
+                        <li style="padding:10px 0;border-bottom:1px solid #E2E8F0;">
+                            <strong style="color:#1E3A8A;">1. MARKET ANALYSIS</strong><br>
+                            <span class="text-muted text-small">Based on your "${idea?.title || 'project'}" idea, we analyzed current trends.</span>
+                        </li>
+                        <li style="padding:10px 0;border-bottom:1px solid #E2E8F0;">
+                            <strong style="color:#1E3A8A;">2. MOMENTUM BUILDING</strong><br>
+                            <span class="text-muted text-small">The "First Simple Step" (${roadmap.firstStep}) has the highest completion-to-impact ratio.</span>
+                        </li>
+                        <li style="padding:10px 0;">
+                            <strong style="color:#1E3A8A;">3. REFINEMENT PHASE</strong><br>
+                            <span class="text-muted text-small">Quality in the top 10% of projects generates 80% of the results.</span>
+                        </li>
+                    `;
+
+            navigateTo('roadmap');
+            showToast('✅ Personalized roadmap generated!');
+        }
+
+        // ============================================================
+        // POPULATE TREE ROADMAP
+        // ============================================================
+        function populateTreeRoadmap(roadmap) {
+            console.log('📋 Populating roadmap with data:', roadmap);
+
+            function renderTaskItems(tasks) {
+                if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+                    return `<div class="task-item"><span class="task-bullet">●</span><div><span class="task-title">Plan your work</span></div></div>`;
+                }
+                return tasks.map(task => `
+                            <div class="task-item">
+                                <span class="task-bullet">●</span>
+                                <div>
+                                    <span class="task-title">${task}</span>
+                                </div>
+                            </div>
+                        `).join('');
+            }
+
+            function renderWeek(weekData, index, phase) {
+                const weekId = `${phase}-week-${index}`;
+                const isFirst = index === 0;
+                const weekLabel = weekData.week || weekData.title || `Week ${index + 1}`;
+                const tasks = weekData.tasks || weekData || [];
+
+                return `
+                            <div class="tree-week" id="${weekId}">
+                                <div class="week-connector"></div>
+                                <div class="week-content">
+                                    <div class="week-header" onclick="toggleWeek('${weekId}')">
+                                        <span class="week-number">${weekLabel}</span>
+                                        <span class="week-toggle">${isFirst ? '▼' : '▼'}</span>
+                                    </div>
+                                    <div class="week-tasks ${isFirst ? '' : 'collapsed'}">
+                                        ${renderTaskItems(tasks)}
+                                        <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('✅ Week marked complete!')">✓ Mark Complete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+            }
+
+            // Phase 1
+            const phase1Content = document.querySelector('#phase1 .phase-content');
+            if (phase1Content && roadmap.phase1 && roadmap.phase1.length > 0) {
+                phase1Content.innerHTML = roadmap.phase1.map((week, i) => renderWeek(week, i, 'phase1')).join('');
+            }
+
+            // Phase 2
+            const phase2Content = document.querySelector('#phase2 .phase-content');
+            if (phase2Content && roadmap.phase2 && roadmap.phase2.length > 0) {
+                phase2Content.innerHTML = roadmap.phase2.map((week, i) => renderWeek(week, i, 'phase2')).join('');
+            }
+
+            // Phase 3
+            const phase3Content = document.querySelector('#phase3 .phase-content');
+            if (phase3Content && roadmap.phase3 && roadmap.phase3.length > 0) {
+                const colors = ['#14B8A6', '#F59E0B', '#10B981'];
+                phase3Content.innerHTML = roadmap.phase3.map((week, i) => {
+                    const weekId = `phase3-week-${i}`;
+                    const weekLabel = week.week || week.title || `Week ${i + 1}`;
+                    const tasks = week.tasks || week || [];
+                    const color = colors[i] || '#14B8A6';
+                    return `
+                                <div class="tree-week" id="${weekId}">
+                                    <div class="week-connector"></div>
+                                    <div class="week-content">
+                                        <div class="week-header" onclick="toggleWeek('${weekId}')">
+                                            <span class="week-number" style="color:${color};">${weekLabel}</span>
+                                            <span class="week-toggle">▼</span>
+                                        </div>
+                                        <div class="week-tasks collapsed">
+                                            ${renderTaskItems(tasks)}
+                                            <button class="btn-success task-complete" style="font-size:11px;padding:2px 12px;margin-top:6px;" onclick="showToast('✅ Week marked complete!')">✓ Mark Complete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                }).join('');
+            }
+        }
+
+        // ============================================================
+        // REGENERATE RISKS
+        // ============================================================
+        async function regenerateRisks() {
+            const ideaInput = currentIdeaData?.rawInput || window._currentIdeaData?.rawInput;
+
+            if (!ideaInput) {
+                showToast('⚠️ No idea found to re-analyze.');
+                return;
+            }
+
+            showToast('🔄 Re-analyzing risks with AI...');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea: ideaInput })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Groq API unavailable');
+                }
+
+                const data = await response.json();
+                const risks = data.risks || generateFallbackRisks(ideaInput);
+
+                generatedRisks = risks;
+                if (currentIdeaData) currentIdeaData.risks = risks;
+                if (window._currentIdeaData) window._currentIdeaData.risks = risks;
+
+                if (currentIdeaId) {
+                    try {
+                        await db.collection('ideas').doc(currentIdeaId).update({ risks: risks, edited: 'Just now' });
+                    } catch (e) { console.warn('Could not update Firestore:', e); }
+                }
+
+                displayRisks(risks);
+                showToast('✅ Risks re-analyzed with fresh AI perspective!');
+
+            } catch (error) {
+                console.warn('Groq API failed, using fallback:', error.message);
+                const risks = generateFallbackRisks(ideaInput);
+                generatedRisks = risks;
+                if (currentIdeaData) currentIdeaData.risks = risks;
+                if (window._currentIdeaData) window._currentIdeaData.risks = risks;
+                displayRisks(risks);
+                showToast('🔄 Risks re-analyzed (fallback mode)');
+            }
+        }
+
+        // ============================================================
+        // DISPLAY RISKS
+        // ============================================================
+        function displayRisks(risks) {
+            const container = document.getElementById('riskContainer');
+            if (!risks || risks.length === 0) {
+                container.innerHTML = '<p class="text-muted" style="grid-column:1/-1;text-align:center;padding:40px 0;">No risks identified.</p>';
+                return;
+            }
+
+            container.innerHTML = risks.map(risk => `
+                        <div class="card risk-card risk-${risk.priority}">
+                            <div class="flex-between">
+                                <span class="tag" style="background:${risk.priority === 'high' ? '#FEE2E2' : risk.priority === 'medium' ? '#FEF3C7' : '#D1FAE5'}; color:${risk.priority === 'high' ? '#B91C1C' : risk.priority === 'medium' ? '#92400E' : '#065F46'};">
+                                    ${risk.priority === 'high' ? '🔴 High Priority' : risk.priority === 'medium' ? '🟡 Medium Risk' : '🟢 Low Priority'}
+                                </span>
+                            </div>
+                            <h4 style="margin:8px 0 4px;">${risk.title}</h4>
+                            <p class="text-muted">${risk.description}</p>
+                            <div style="background:${risk.priority === 'high' ? '#FEF2F2' : risk.priority === 'medium' ? '#FFFBEB' : '#ECFDF5'}; padding:10px 14px; border-radius:12px; margin-top:10px;">
+                                <strong>RECOMMENDATION</strong> ${risk.recommendation}
+                            </div>
+                        </div>
+                    `).join('');
+
+            document.getElementById('coreProblemText').innerHTML = `
+                        <strong>92%</strong> of users face challenges related to "${currentIdeaData?.title || 'your project'}".
+                        <span class="chip">Confidence Level: 94%</span>
+                    `;
+        }
+
+        // ============================================================
+        // TREE ROADMAP FUNCTIONS
+        // ============================================================
+        function togglePhase(phaseId) {
+            const phase = document.getElementById(phaseId);
+            if (!phase) return;
+            const content = phase.querySelector('.phase-content');
+            const toggle = phase.querySelector('.phase-toggle');
+            if (content) {
+                content.classList.toggle('collapsed');
+                if (toggle) toggle.classList.toggle('open');
+            }
+        }
+
+        function toggleWeek(weekId) {
+            const week = document.getElementById(weekId);
+            if (!week) return;
+            const tasks = week.querySelector('.week-tasks');
+            const toggle = week.querySelector('.week-toggle');
+            if (tasks) {
+                tasks.classList.toggle('collapsed');
+                if (toggle) toggle.classList.toggle('open');
+            }
+        }
+
+        function toggleAllPhases() {
+            const phases = document.querySelectorAll('.tree-phase');
+            const allCollapsed = Array.from(phases).every(p =>
+                p.querySelector('.phase-content')?.classList.contains('collapsed')
+            );
+            phases.forEach(phase => {
+                const content = phase.querySelector('.phase-content');
+                const toggle = phase.querySelector('.phase-toggle');
+                if (allCollapsed) {
+                    content?.classList.remove('collapsed');
+                    toggle?.classList.remove('open');
+                } else {
+                    content?.classList.add('collapsed');
+                    toggle?.classList.add('open');
+                }
+            });
+        }
+
+        function initRoadmap() {
+            const phase1 = document.getElementById('phase1');
+            if (phase1) {
+                const content = phase1.querySelector('.phase-content');
+                content?.classList.remove('collapsed');
+                const toggle = phase1.querySelector('.phase-toggle');
+                toggle?.classList.remove('open');
+            }
+            const week1 = document.getElementById('week1');
+            if (week1) {
+                const tasks = week1.querySelector('.week-tasks');
+                tasks?.classList.remove('collapsed');
+                const toggle = week1.querySelector('.week-toggle');
+                toggle?.classList.remove('open');
+            }
+        }
+
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+        function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        function typeText(element, text, speed) {
+            return new Promise((resolve) => {
+                let i = 0;
+                element.textContent = '';
+                const interval = setInterval(() => {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
+
+        // ============================================================
+        // EVENT HANDLERS
+        // ============================================================
+        document.getElementById('startClarifyBtn').onclick = function() {
+            const input = document.getElementById('ideaInput').value.trim();
+            if (!input) { showToast('⚠️ Please describe your idea first!'); return; }
+            navigateTo('clarify');
+            processIdea(input);
+        };
+
+        document.getElementById('continueToRisks').onclick = function() {
+            const risks = generatedRisks;
+            if (risks.length === 0) {
+                showToast('⚠️ No risks generated. Please clarify your idea first.');
+                return;
+            }
+            displayRisks(risks);
+            navigateTo('risks');
+            showToast('✅ Risk assessment ready!');
+        };
+
+        document.getElementById('ideaInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('startClarifyBtn').click();
+            }
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initRoadmap();
+        });
+
+        console.log('🚀 Clarity Compass loaded!');
+        console.log('🔥 Connected to Firebase project:', firebaseConfig.projectId);
+        console.log('📡 Using API endpoint:', API_URL);
+    </script>
+</body>
+</html>
